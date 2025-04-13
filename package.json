@@ -1,0 +1,13 @@
+{
+  "type": "module",
+  "scripts": {
+    "build": "./build.sh"
+  },
+  "dependencies": {
+    "@seald-io/nedb": "^4.1.1",
+    "busboy": "^1.6.0",
+    "cors": "^2.8.5",
+    "express": "^5.1.0",
+    "mkdirp": "^3.0.1"
+  }
+}
