@@ -27,6 +27,35 @@ It is **strongly recommended to start with the browser-based version**, and only
 
 ---
 
+## 🌍 Usage in the browser
+
+You can use Peacock directly in the browser by importing it and adding it as a middleware to [xfetch](https://github.com/yourusername/xfetch):
+
+```js
+import xfetch from 'https://esm.sh/@camilaprav/xfetch';
+import peacock from 'https://esm.sh/@camilaprav/peacock';
+
+// Register Peacock as a middleware
+xfetch.middlewares.push(peacock);
+```
+
+To target the local (in-browser) Peacock middleware, requests must be made to the `peacock://` protocol:
+
+```js
+await xfetch('peacock://db/myspace/users');
+await xfetch('peacock://upload/myspace', { body: formData });
+```
+
+To switch to a real server implementation later, simply change your `xfetch` request URLs to standard HTTPS that points to a Peacock server:
+
+```js
+await xfetch('https://api.example.com/db/myspace/users');
+```
+
+This allows you to use the same request logic in both environments with minimal changes.
+
+---
+
 ## 📦 Installation
 
 ```bash
@@ -47,7 +76,7 @@ This creates:
 
 ---
 
-## 🧑‍💻 Usage (Server)
+## 🧑‍💻 Server Usage
 
 ### Start the server
 

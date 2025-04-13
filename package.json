@@ -1,7 +1,12 @@
 {
+  "name": "@camilaprav/peacock",
+  "version": "0.0.0",
+  "description": "Isomorphic document database, file hosting, and mail sending",
   "type": "module",
+  "browser": "peacock.browser.js",
   "scripts": {
-    "build": "./build.sh"
+    "build": "./build.sh",
+    "start": "node server.js"
   },
   "dependencies": {
     "@seald-io/nedb": "^4.1.1",
@@ -9,5 +14,16 @@
     "cors": "^2.8.5",
     "express": "^5.1.0",
     "mkdirp": "^3.0.1"
-  }
+  },
+  "devDependencies": {},
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/camilaprav/peacock.git"
+  },
+  "author": "Camila Prá",
+  "license": "AGPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/camilaprav/peacock/issues"
+  },
+  "homepage": "https://github.com/camilaprav/peacock#readme"
 }
