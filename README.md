@@ -1,0 +1,145 @@
+# 🦚 Peacock
+
+Peacock is a lightweight, FeathersJS-inspired middleware for Express that provides RESTful API endpoints for embedded document database operations and file uploads. It supports both Node.js and browser environments with the same core logic.
+
+⚠️ **Work in Progress**: This project is still under active development. APIs may change, and breaking updates are possible until a stable release is published.
+
+It is **strongly recommended to start with the browser-based version**, and only migrate to a server when it's time to actually share data between users. This helps reduce setup complexity and makes development faster and more self-contained.
+
+---
+
+## 🚀 Features
+
+- 🗃️ **Embedded Document Database API**  
+  REST-style endpoints (`GET`, `POST`, `PUT`, `DELETE`) to interact with NeDB collections scoped by namespace. Collections are created on-demand—no need for pre-registration.
+
+- 📁 **File Upload API**  
+  Upload files via `multipart/form-data`, automatically store them under a unique URL, and support retrieval. **Note:** File uploads are stored separately and have no connection to NeDB.
+
+- 🔄 **Pluggable Hooks**  
+  Add custom middleware logic (`before`, `after`, and `around`) per collection. The hook system is designed to mimic [FeathersJS](https://feathersjs.com)'s service lifecycle hooks for familiarity and flexibility.
+
+- 🌐 **Dual Environment Support**  
+  Works in both Node.js (with Express) and browser (with localForage).
+
+- 🧩 **Extensible Roadmap**  
+  A MongoDB adapter and built-in mail sending functionality are planned for future releases.
+
+---
+
+## 📦 Installation
+
+```bash
+git clone https://github.com/yourusername/peacock
+cd peacock
+npm install
+```
+
+To build the server and browser versions:
+
+```bash
+npm run build
+```
+
+This creates:
+- `peacock.server.js` – for use in Node.js environments.
+- `peacock.browser.js` – for use in browser apps.
+
+---
+
+## 🧑‍💻 Usage (Server)
+
+### Start the server
+
+```bash
+node server.js
+```
+
+### Database API
+
+`/db/:namespace/:collection[/:id]`
+
+Collections are created automatically upon first access—no setup required.
+
+#### Examples
+
+- `GET /db/myspace/users` – find documents
+- `GET /db/myspace/users/:id` – get one document
+- `POST /db/myspace/users` – insert document
+- `PUT /db/myspace/users` – update document (by `_id`)
+- `DELETE /db/myspace/users?name=John` – remove matching documents
+
+### File Upload
+
+`POST /upload/:namespace`  
+Uploads a file under the given namespace.
+
+#### Request
+
+- Content-Type: `multipart/form-data`
+- Form field: `file`
+
+#### Response
+```json
+{
+  "namespace": "myspace",
+  "id": "generated-id",
+  "url": "/uploads/myspace/generated-id/filename.ext"
+}
+```
+
+---
+
+## 🧩 Hooks API
+
+You can register lifecycle hooks for specific collections:
+
+```js
+peacock.hooks('myspace/users', {
+  before: [
+    async (ctx) => {
+      if (ctx.method === 'create') {
+        ctx.data.createdAt = new Date();
+      }
+    }
+  ]
+});
+```
+
+Available hook types: `around`, `before`, `after`.
+
+The hook system mimics FeathersJS's lifecycle model, allowing you to extend and customize behavior with familiar patterns.
+
+Each hook receives a `ctx` object:
+```js
+{
+  method,     // One of: 'get', 'find', 'create', 'update', 'remove'
+  id,         // Document ID (if applicable)
+  params,     // URL query parameters
+  data,       // Request body (for POST/PUT)
+  result,     // The result to send back
+  req,        // Raw Express request
+  res         // Raw Express response
+}
+```
+
+---
+
+## 🧪 Development Notes
+
+- **Browser version** uses ES modules and `localForage` for simulated file storage.
+- Designed to be environment-agnostic while maintaining modularity and clarity.
+
+---
+
+## 📜 License
+
+Affero General Public License v3.0 or later (AGPLv3+)
+
+You are free to use, modify, and redistribute this software under the terms of the AGPLv3+. If you deploy Peacock as part of a networked service, you must make the source code available to users of that service.
+
+---
+
+## 🧠 Inspiration
+
+Peacock is inspired by [FeathersJS](https://feathersjs.com), but takes a more minimal and file-centric approach. It aims to be portable, environment-aware, and easy to plug into any web stack.

@@ -1,4 +1,4 @@
 #/bin/sh
 set -e
-cat prefix.server.js peacock.core.js > peacock.server.js
-cat prefix.browser.js peacock.core.js > peacock.browser.js
+cat header prefix.server.js peacock.core.js > peacock.server.js
+cat header prefix.browser.js peacock.core.js > peacock.browser.js
