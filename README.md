@@ -56,6 +56,41 @@ This allows you to use the same request logic in both environments with minimal 
 
 ---
 
+## 🧩 Hooks API
+
+You can register lifecycle hooks for specific collections:
+
+```js
+peacock.hooks('myspace/users', {
+  before: [
+    async (ctx) => {
+      if (ctx.method === 'create') {
+        ctx.data.createdAt = new Date();
+      }
+    }
+  ]
+});
+```
+
+Available hook types: `around`, `before`, `after`.
+
+The hook system mimics FeathersJS's lifecycle model, allowing you to extend and customize behavior with familiar patterns.
+
+Each hook receives a `ctx` object:
+```js
+{
+  method,     // One of: 'get', 'find', 'create', 'update', 'remove'
+  id,         // Document ID (if applicable)
+  params,     // URL query parameters
+  data,       // Request body (for POST/PUT)
+  result,     // The result to send back
+  req,        // Raw Express request
+  res         // Raw Express response
+}
+```
+
+---
+
 ## 📦 Installation
 
 ```bash
@@ -114,41 +149,6 @@ Uploads a file under the given namespace.
   "namespace": "myspace",
   "id": "generated-id",
   "url": "/uploads/myspace/generated-id/filename.ext"
-}
-```
-
----
-
-## 🧩 Hooks API
-
-You can register lifecycle hooks for specific collections:
-
-```js
-peacock.hooks('myspace/users', {
-  before: [
-    async (ctx) => {
-      if (ctx.method === 'create') {
-        ctx.data.createdAt = new Date();
-      }
-    }
-  ]
-});
-```
-
-Available hook types: `around`, `before`, `after`.
-
-The hook system mimics FeathersJS's lifecycle model, allowing you to extend and customize behavior with familiar patterns.
-
-Each hook receives a `ctx` object:
-```js
-{
-  method,     // One of: 'get', 'find', 'create', 'update', 'remove'
-  id,         // Document ID (if applicable)
-  params,     // URL query parameters
-  data,       // Request body (for POST/PUT)
-  result,     // The result to send back
-  req,        // Raw Express request
-  res         // Raw Express response
 }
 ```
 
