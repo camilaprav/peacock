@@ -127,7 +127,9 @@ async function makePeacock({ storage = 'storage' } = {}) {
   }
 
   async function handleDatabaseRequest(req, res) {
-    let [, , namespace, collection, maybeId] = req.url.split('/');
+    let [, , namespace, collection, maybeId] = req.url
+      .replace(/[?#].*$/, '')
+      .split('/');
     if (!namespace || !collection) return false;
 
     let key = `${namespace}/${collection}`;
