@@ -42,8 +42,8 @@ xfetch.middlewares.push(peacock);
 To target the local (in-browser) Peacock middleware, requests must be made to the `peacock://` protocol:
 
 ```js
-await xfetch('peacock://db/myspace/users');
-await xfetch('peacock://upload/myspace', { body: formData });
+await xfetch('peacock://browser/db/myspace/users');
+await xfetch('peacock://browser/upload/myspace', { body: formData });
 ```
 
 To switch to a real server implementation later, simply change your `xfetch` request URLs to standard HTTPS that points to a Peacock server:
@@ -94,7 +94,7 @@ Each hook receives a `ctx` object:
 ## 📦 Installation
 
 ```bash
-git clone https://github.com/yourusername/peacock
+git clone https://github.com/camilaprav/peacock
 cd peacock
 npm install
 ```

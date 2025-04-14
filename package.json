@@ -1,6 +1,6 @@
 {
   "name": "@camilaprav/peacock",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Isomorphic document database, file hosting, and mail sending",
   "type": "module",
   "browser": "peacock.browser.js",
