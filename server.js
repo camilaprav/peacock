@@ -2,9 +2,10 @@ import cors from 'cors';
 import express from 'express';
 import peacock from './peacock.server.js';
 
-const app = express();
+let app = express();
 
 // Express middleware to simulate Peacock request structure
+/*
 app.use((req, res, next) => {
   req.raw = {
     input: `http://example.com${req.url}`,
@@ -12,20 +13,16 @@ app.use((req, res, next) => {
   };
   next();
 });
+*/
 
-// Body parser (for JSON POSTs etc.)
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(peacock);
+app.use((req, res) => res.status(404).send('Not Found'));
 
-// Catch-all fallback
-app.use((req, res) => {
-  res.status(404).send('Not Found');
+let port = process.env.PORT || 3000;
+let server = app.listen(port, () => {
+  console.log(`🦚 Peacock is unfurling its feathers at http://localhost:${port}`);
 });
-
-// Start it
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Peacock server running at http://localhost:${PORT}`);
-});
+server.on('error', err => err.code === 'EADDRINUSE' && console.error(`❌ Port ${port} is already in use.`));

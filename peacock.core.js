@@ -25,8 +25,6 @@ async function makePeacock({ storage = 'storage' } = {}) {
     if (isBrowser && req.protocol !== 'peacock') return next?.();
 
     try {
-      if (isBrowser) emulateExpressRequest(req);
-
       if (req.method === 'POST' && req.url.startsWith('/upload')) {
         return await handleUpload(req, res);
       }
@@ -55,12 +53,6 @@ async function makePeacock({ storage = 'storage' } = {}) {
     });
   };
 
-  function emulateExpressRequest(req) {
-    let parsed = new URL(req.raw.input);
-    req.query = Object.fromEntries(parsed.searchParams.entries());
-    req.url = `/${parsed.host}${parsed.pathname}${parsed.search}`;
-  }
-
   async function handleUpload(req, res) {
     let id = crypto.randomUUID();
     let dir = uploadStorage;
@@ -71,7 +63,7 @@ async function makePeacock({ storage = 'storage' } = {}) {
       await mkdirp(dir);
       let busboy = Busboy({ headers: req.headers });
       let fileHandle = await fsp.open(storagePath, 'w');
-      req.raw.body.pipe(busboy);
+      req.pipe(busboy);
 
       await new Promise((resolve, reject) => {
         busboy.on('file', (_field, file, { filename: incomingName }) => {
