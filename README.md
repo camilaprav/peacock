@@ -6,6 +6,8 @@ Peacock is a lightweight, FeathersJS-inspired middleware for Express that provid
 
 It is **strongly recommended to start with the browser-based version**, and only migrate to a server when it's time to actually share data between users. This helps reduce setup complexity and makes development faster and more self-contained.
 
+Published under the super-permissive ISC license (see [License](#License)).
+
 ---
 
 ## 🚀 Features
@@ -161,14 +163,18 @@ Uploads a file under the given namespace.
 
 ---
 
-## 📜 License
-
-Affero General Public License v3.0 or later (AGPLv3+)
-
-You are free to use, modify, and redistribute this software under the terms of the AGPLv3+. If you deploy Peacock as part of a networked service, you must make the source code available to users of that service.
-
----
-
 ## 🧠 Inspiration
 
 Peacock is inspired by [FeathersJS](https://feathersjs.com), but takes a more minimal and file-centric approach. It aims to be portable, environment-aware, and easy to plug into any web stack.
+
+---
+
+## License
+
+### ISC (Internet Systems Consortium)
+
+Peacock is free software: you can redistribute it and/or modify it under the terms of the [ISC License](COPYING).
+
+## Exclusion of warranty
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT, INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
