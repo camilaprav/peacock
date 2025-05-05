@@ -34,11 +34,10 @@ async function makePeacock({ storage = 'storage' } = {}) {
       }
 
       if (req.url.startsWith('/db/')) {
-        let handled = await handleDatabaseRequest(req, res);
-        if (handled) return handled;
+        return await handleDatabaseRequest(req, res);
       }
 
-      return next?.();
+      res.status(400).send(`Unknown route: ${req.url}`);
     } catch (err) {
       return handleError(err, res);
     }
@@ -130,7 +129,8 @@ async function makePeacock({ storage = 'storage' } = {}) {
     let [, , namespace, collection, maybeId] = req.url
       .replace(/[?#].*$/, '')
       .split('/');
-    if (!namespace || !collection) return false;
+    if (!namespace || !collection)
+      return res.status(400).send(`Missing namespace or collection`);
 
     let key = `${namespace}/${collection}`;
     let filename = `${dbStorage}/${key}.db`;
@@ -141,14 +141,12 @@ async function makePeacock({ storage = 'storage' } = {}) {
 
     let ds = datastores.get(key);
     let method = getMethod(req.method, maybeId);
-    if (!method) return res.status(405).send('Method not allowed');
 
     let ctx = {
       method,
-      id: maybeId || null,
+      id: maybeId,
       params: req.query,
       data: req.body,
-      result: undefined,
       req,
       res,
     };
@@ -157,32 +155,61 @@ async function makePeacock({ storage = 'storage' } = {}) {
     for (let hook of hooks.around || []) await hook(ctx);
     for (let hook of hooks.before || []) await hook(ctx);
 
+    console.log(method, req, ctx.params, ctx.data);
     if (method === 'get') {
-      let result = await ds.findOneAsync({ _id: ctx.id });
-      if (!result) return res.status(404).send('Not found');
-      ctx.result = result;
+      if (!ctx.data || !ctx.data.id) {
+        return res.status(400).send('Missing id for get');
+      }
+      ctx.result = await ds.findOneAsync({ _id: ctx.data.id });
+      if (!ctx.result) return res.status(404).send('Not found');
     } else if (method === 'find') {
       ctx.result = await ds.findAsync(ctx.params);
     } else if (method === 'create') {
       ctx.result = await ds.insertAsync(ctx.data);
     } else if (method === 'update') {
-      ctx.result = {
-        updated: await ds.updateAsync({ _id: ctx.data._id }, ctx.data, {}),
-      };
+      if (ctx.params?._id) {
+        // FIXME: What about possibly other provided params?
+        // Single document update by _id
+        ctx.result = {
+          updated: await ds.updateAsync({ _id: ctx.params._id }, ctx.data, {}),
+        };
+      } else if (ctx.params && Object.keys(ctx.params).length > 0) {
+        // Multiple documents update by query
+        consosle.log(ctx.params, ctx.data);
+        ctx.result = {
+          updated: await ds.updateAsync(ctx.params, ctx.data, { multi: true }),
+        };
+      } else {
+        return res
+          .status(400)
+          .send('Missing _id or query parameters for update');
+      }
+    } else if (method === 'patch') {
+      if (ctx.id) {
+        ctx.result = {
+          updated: await ds.updateAsync({ _id: ctx.id }, ctx.data, {}),
+        };
+      } else if (ctx.params && Object.keys(ctx.params).length > 0) {
+        console.log(ctx.params);
+        ctx.result = await ds.updateAsync(ctx.params, ctx.data, {
+          multi: true,
+        });
+      } else {
+        return res.status(400).send('Missing ID or query parameters for patch');
+      }
     } else if (method === 'remove') {
       if (!ctx.params || Object.keys(ctx.params).length === 0) {
         return res
           .status(400)
           .send('Refusing to delete entire collection without a query.');
       }
-      ctx.result = {
-        deleted: await ds.removeAsync(ctx.params, { multi: true }),
-      };
+      ctx.result = await ds.removeAsync(ctx.params, { multi: true });
+    } else {
+      return res.status(405).send('Unknown method');
     }
 
     for (let hook of hooks.after || []) await hook(ctx);
     for (let hook of hooks.around || []) await hook(ctx);
-
     return res.json(ctx.result);
   }
 
@@ -190,6 +217,7 @@ async function makePeacock({ storage = 'storage' } = {}) {
     if (method === 'GET') return id ? 'get' : 'find';
     if (method === 'POST') return 'create';
     if (method === 'PUT') return 'update';
+    if (method === 'PATCH') return 'patch';
     if (method === 'DELETE') return 'remove';
     return null;
   }
